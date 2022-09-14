@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2022 by DonOfTheFuture (http://jsbin.com/pumafon/1/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta  name="Donald Demo of Angular.js" content="width=device-width">
+  <title>Angular Table</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js">
+  </script>
+  
+  <style>
+    html{
+      background-color: black;
+    }
+    
+    h1{
+      position: relative;
+      background: linear-gradient(lightgreen, green);
+      margin: 0px;
+      text-align: center;
+      text-decoration: underline;
+      border: solid 1px black;
+      color: white;
+    }
+    form{
+      display: flex;
+      flex-wrap: no-wrap;
+      flex: 1;
+    }
+    input{
+     background: linear-gradient(silver, white);
+      color: white;
+    }
+    input, button{
+      height: 35px;
+      position: relative;
+      margin: 0px;
+      text-align: center;
+      width: 20.9%;
+      font-size: 165%;
+       font-family: "Times New Roman", Times, serif;
+      cursor: pointer;
+      border: none;
+      outline: pointer;
+    }
+  
+    table > td{
+         text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-x: hidden;
+      height: 35px;
+      text-overflow: ellipsis;
+      text-align: center;
+ 
+    }
+    table > tr{
+      height: 30px;
+      text-align: center;
+    }
+    table tr:nth-child(odd){
+      background-color: lightgreen;
+    }
+    table > th{
+      width: 20%;
+      border: solid 1px black;
+     
+    }
+    td > input[type=checkbox]{
+      width: 100%;
+      height: 90px;
+      margin: 0px;
+    }
+    body{
+      width: 90%;
+      position: relative;
+      margin: auto;
+      border: solid 4px white;
+      max-width: 1440px;
+      margin-top: 25px;
+    }
+  </style>
+</head>
+ 
+<body ng-app="myApp" ng-controller="data_log" ng-mouseenter="loadData()">
+        <input name="Rest" ng-model="Rest" type="url" placeholder="data url" style="width: 99%; display: none" ng-invalid ng-keypress="addDataURL()" style="border-color: {{}}" srch-directive>
+      <form name="log">
+      <input ng-empty ng-invalid autocomplete="off" minlength="3" placeholder="Name" name="Name" ng-model="name" type="text" required>
+      <input ng-empty ng-invalid autocomplete="off" placeholder="Email" name="Email" ng-model="email" type="email" required>
+      <input ng-empty ng-invalid autocomplete="off" placeholder="Password" name="Password" ng-model="password" minlength="7" type="password" required>
+      <input ng-empty ng-invalid autocomplete="off" placeholder="Img Url" name="Image" ng-model="image" type="url"  minlength="15" required>
+      
+          <button style="height: 40px;background-color: white;" ng-disabled="log.Name.$invalid-required || log.Email.$invalid-required || log.Password.$invalid-required" ng-click="savedData()">Submit</button>
+
+  </form>
+  
+       
+    <h1>Data Table</h1>
+ 
+
+<div id="search-div">
+    <input type="text" name="term" ng-model="term" placeholder="search" style="width: 70%"><button  style="width: 28.8%;height: 40px;top:-3px; ;font-size: 100%; background: linear-gradient(white, silver);border: none;color: white;font-family: Arial;" ng-click="remTD()">Remove Marked</button>
+  </div>
+
+  <table style="width: 100%; text-align: center: overflow-y: auto;max-height: 700px;background-color: white;">
+    <tr style="background-color: white; height: 40px;border: solid 1px black;">
+      <th>Name</th>
+      <th>Email</th>
+      <th>Password</th>
+      <th>Image</th>
+      <th> </th>
+    </tr>
+    <tr class="row" style="text-align:center" ng-repeat="x in loggedData | filter:{name: term}">
+       <td >{{ x.name }}</td>
+      <td >{{ x.email }}</td>
+      <td >{{ x.password }}</td>
+      <td ><img src={{x.image}}/></td> 
+      <td style="width: 30px;"><input type="checkbox" ng-model="x.checked"></td>
+    </tr>
+  </table>
+  <div ng-hide="hasData" style="width: 70%; border: solid 1px lightblue;margin: auto;text-align: center;height: 400px;width: 100%;line-height: 1170%;margin-top: 40px;border: solid white 2px;">
+    <h3 style="background: linear-gradient(lightgreen, green); position: relative; align-items: center;height: 180px;margin-top: 110px;width: 70%;left: 15%;border: solid 2px white;font-family: Arial;font-size: 200%;text-decoration: underline">THERE IS NO DATA</h3></div>
+  
+</body>
+  <script type="text/javascript">
+
+    var app = angular.module('myApp', [])
+    app.controller("data_log", function($scope, $http){
+      $scope.loggedData = []
+      $scope.sameData = false
+      $scope.hasData = false
+      $scope.validURL = false
+
+      $scope.fltrRows = function(e){
+        let data = $scope.loggedData
+        let newArr = []
+        angular.forEach(data, function(obj){
+          if(!obj.name.includes($scope.term)){
+            
+                obj.display = 'none'
+          }else{
+                  obj.display = 'block'
+          }
+   newArr.push(obj)
+        })
+        $scope.loggedData  = newArr
+      }
+      $scope.savedData = function(e){
+        let newObj = Object.create({})
+        let LS = localStorage.getItem('pplData')
+        LS = (LS === null)? [] : LS
+        newObj.name = $scope.name
+        newObj.email = $scope.email
+        newObj.password = $scope.password
+newObj.image = ($scope.image === undefined)? 'https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg': $scope.image
+        if($scope.loggedData.length > 0){
+          $scope.sameData = $scope.loggedData.some((obj)=>{
+            return obj.name == $scope.name || obj.email == $scope.email
+          })
+          if($scope.sameData === true){
+            let data = $scope.loggedData
+            let recReplCon = confirm('Log Exists. Replace Row?')
+            if(recReplCon === true){
+              let sameObj = data.filter((obj)=>{
+                return obj.name == $scope.name || obj.email == $scope.email
+              })[0]
+   data[data.indexOf(sameObj)] = newObj
+   $scope.loggedData = data
+            }else{
+                   $scope.loggedData.push(newObj) 
+                   localStorage.setItem('pplData',$scope.loggedData)
+            }
+          }else{
+                    $scope.loggedData.push(newObj)
+                     localStorage.setItem('pplData',$scope.loggedData)
+          }
+      }else{
+        $scope.loggedData.push(newObj)
+        $scope.hasData = true
+                             localStorage.setItem('pplData',$scope.loggedData)
+      }
+      }
+      $scope.search = function(e){
+        let type = e.type
+        let newArr = []
+      for(let log = 0; log < $scope.loggedData.length; log++){
+        let logObj = $scope.loggedData[log]
+        if(logObj.name.includes($scope.term)){
+           logObj.display = 'none'
+           newArr.push(logObj)
+        }
+      }
+      
+      $scope.loggedData = newArr
+      }
+      $scope.orgnlTable = function(e){
+         $scope.loggedData =  $scope.loggedData.map((obj, i)=>{ 
+           let disObj = obj
+           disObj.display = 'block'
+           return disObj
+         })
+      }
+      $scope.remTD = function(e){
+        let con = confirm('Remove Marked?')
+        if(con == true){
+        let data = $scope.loggedData
+        $scope.loggedData = []
+        angular.forEach(data, function(obj){
+          if(!obj.checked){$scope.loggedData.push(obj)}
+   
+        })
+        
+        }else{
+          e.preventDefault()
+        }
+      }
+      $scope.addDataURL = function(e){
+        let key = e.keyCode || e.which
+        if(key == 13 && $scope.validURL === true){
+        let orgnlData = $scope.loggedData
+          $http.get($scope.Rest).then(function(response) {
+    $scope.loggedData = orgnlData.concat(response.data)
+  }).catch(function(e){console.log(e.name, e.message)})
+      }}
+       $scope.loadData = function(e){
+     let ls = localStorage.getItem('pplData')
+     if((typeof ls).toLowerCase() === 'object'){
+       ls.forEach((obj)=>{
+                             $scope.loggedData.push(obj)
+       })
+     }
+   }
+    })
+  app.directive("srchDirective", function(){
+    return{
+      require:'ngModel',
+      link: function(scope, element,attr,mCtrl){
+        function myValidation(val){
+           if(val.indexOf('.php') > -1 && val.length> 5){
+              mCtrl.$setValidity('hasPHP', true)
+                            element.style.borderColor = 'green'
+    scope.validURL = true
+           }else{
+              mCtrl.$setValidity('hasPHP', false)
+                            element.style.borderColor = 'red'
+                            scope.validURL = false
+
+           }
+        }
+      }
+    }
+  })
+
+  </script>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
